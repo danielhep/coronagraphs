@@ -3,7 +3,7 @@
     <div class="column">
       <testing-v-positive-cases />
     </div>
-    <b-menu class="column container is-fluid is-one-fifth">
+    <b-menu style="padding-top: 20px" class="column container is-fluid is-one-fifth">
       <b-menu-list label="Graphs">
         <b-menu-item icon="information-outline" active label="Testing Capacity vs Positive Cases"></b-menu-item>
       </b-menu-list>
