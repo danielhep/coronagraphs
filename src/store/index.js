@@ -7,9 +7,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    stateData: {
-
-    }
+    stateData: []
   },
   mutations: {
     setStateData (state, data) {
@@ -18,8 +16,10 @@ export default new Vuex.Store({
   },
   actions: {
     async getDataForDate ({ commit }) {
-      const covidData = (await d3.csv('https://covidtracking.com/api/states/daily.csv?date=20200328', d3.autoType))
-      commit('setStateData', covidData)
+      const covidData = (await d3.csv('https://covidtracking.com/api/states/daily.csv', d3.autoType))
+      const populationData = await d3.csv('/population_states.csv', d3.autoType)
+      const data = populationData.map(d => ({ ...covidData.find(c => c.state === d.state), population: d.pop }))
+      commit('setStateData', data)
     }
   },
   modules: {
