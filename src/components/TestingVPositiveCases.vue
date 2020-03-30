@@ -34,7 +34,7 @@
         </b-field>
       </div>
       <div class="column is-paddingless" ref="container" v-resize="onResize">
-        <svg :id="randomID" style="position: absolute" />
+        <svg :data-id="_uid" style="position: absolute" />
       </div>
     </div>
   </section>
@@ -44,7 +44,6 @@
 import * as d3 from 'd3'
 import { Delaunay } from 'd3-delaunay'
 import { DateTime } from 'luxon'
-import { v4 as uuidv4 } from 'uuid'
 
 export default {
   data () {
@@ -59,7 +58,7 @@ export default {
       populationData: [],
       covidData: [],
       margin: { top: 25, right: 20, bottom: 35, left: 50 },
-      randomID: uuidv4()
+      randomID: this._uid
     }
   },
   mounted () {
@@ -75,7 +74,7 @@ export default {
     this.getDataOnDate()
     this.getPopulationData()
 
-    this.svg = d3.select(`#${this.randomID}`)
+    this.svg = d3.select('svg[data-id="' + this._uid + '"]')
     this.resize()
     this.create()
   },

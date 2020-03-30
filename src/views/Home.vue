@@ -21,6 +21,7 @@ export default {
     TestingVPositiveCases
   },
   created () {
+    this.$store.dispatch('getData')
   }
 }
 </script>

@@ -15,10 +15,10 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    async getDataForDate ({ commit }) {
+    async getData ({ commit }) {
       const covidData = (await d3.csv('https://covidtracking.com/api/states/daily.csv', d3.autoType))
       const populationData = await d3.csv('/population_states.csv', d3.autoType)
-      const data = populationData.map(d => ({ ...covidData.find(c => c.state === d.state), population: d.pop }))
+      const data = covidData.map(d => ({ population: populationData.find(c => c.state === d.state).pop, ...d }))
       commit('setStateData', data)
     }
   },
