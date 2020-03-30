@@ -12,10 +12,11 @@
         <b-field :label="singleDay ? 'Date' : 'Start Date'">
           <b-datepicker
             v-model="date1"
-            @input="getDataOnDate(true) "
+            :min-date="dateRange[0].toJSDate()"
+            :max-date="dateRange[1].toJSDate()"
             placeholder="Click to select..."
             icon="calendar-today"
-            trap-focus
+            :loading="loading"
           ></b-datepicker>
         </b-field>
         <b-field>
@@ -45,46 +46,42 @@ import * as d3 from 'd3'
 import { Delaunay } from 'd3-delaunay'
 import { DateTime } from 'luxon'
 
+import { mapState } from 'vuex'
+
 export default {
   data () {
     return {
       singleDay: true,
       perCapita: true,
       date1: new Date(),
-      loading: false,
       svgWidth: 600,
       svgHeight: 600,
       svg: {},
-      populationData: [],
-      covidData: [],
       margin: { top: 25, right: 20, bottom: 35, left: 50 },
       randomID: this._uid
     }
   },
   mounted () {
-    this.loading = true
-    Promise.all([
-      this.getDataOnDate(),
-      this.getPopulationData()
-    ]).then(() => {
-      this.loading = false
-      this.update()
-    })
-
-    this.getDataOnDate()
-    this.getPopulationData()
-
     this.svg = d3.select('svg[data-id="' + this._uid + '"]')
     this.resize()
     this.create()
   },
   computed: {
+    ...mapState(['dateRange', 'loading']),
     data () {
-      // add population numbers to the data
-      const data = this.populationData.map(d => ({ ...this.covidData.find(c => c.state === d.state), population: d.pop }))
-      data.x = 'Positive cases'
-      data.y = 'Tests performed'
-      return data
+      const dateObj = DateTime.fromJSDate(this.date1)
+      const data = this.$store.state.stateData.filter(d => d.date.toISODate() === dateObj.toISODate())
+
+      let adjustedData
+      if (this.perCapita) {
+        adjustedData = data.map((d) => ({ ...d, x: d.positive / (d.population / 100000), y: d.totalTestResults / (d.population / 100000) }))
+      } else {
+        adjustedData = data.map((d) => ({ ...d, x: d.positive, y: d.totalTestResults }))
+      }
+
+      adjustedData.x = 'Positive cases'
+      adjustedData.y = 'Tests performed'
+      return adjustedData
     }
   },
   methods: {
@@ -98,14 +95,6 @@ export default {
       this.svg.attr('height', Math.round(this.svgHeight))
       this.update()
     },
-    async getDataOnDate (update) {
-      const dateString = DateTime.fromJSDate(this.date1).toFormat('yyyyLLdd')
-      this.covidData = await d3.csv(`https://covidtracking.com/api/states/daily.csv?date=${dateString}`, d3.autoType)
-      if (update) this.update(true)
-    },
-    async getPopulationData () {
-      this.populationData = await d3.csv('/population_states.csv', d3.autoType)
-    },
     update (transition) {
       const width = this.svgWidth
       const height = this.svgHeight
@@ -117,12 +106,7 @@ export default {
       const t = d3.transition()
         .duration(transitionDuration)
 
-      let adjustedData
-      if (this.perCapita) {
-        adjustedData = data.map((d) => ({ ...d, x: d.positive / (d.population / 100000), y: d.totalTestResults / (d.population / 100000) }))
-      } else {
-        adjustedData = data.map((d) => ({ ...d, x: d.positive, y: d.totalTestResults }))
-      }
+      const adjustedData = this.data
 
       const x = d3.scaleLinear()
         .domain(d3.extent(adjustedData, d => d.x)).nice()
@@ -243,7 +227,9 @@ export default {
     }
   },
   watch: {
-    perCapita () { this.update(true) }
+    data () {
+      this.update(true)
+    }
   }
 }
 </script>
