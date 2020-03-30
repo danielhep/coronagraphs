@@ -12,7 +12,7 @@
         <b-field :label="singleDay ? 'Date' : 'Start Date'">
           <b-datepicker
             v-model="date1"
-            @input="async () => {await getDataOnDate(); update() }"
+            @input="getDataOnDate(true) "
             placeholder="Click to select..."
             icon="calendar-today"
             trap-focus
@@ -42,6 +42,8 @@
 
 <script>
 import * as d3 from 'd3'
+import { Delaunay } from 'd3-delaunay'
+import { DateTime } from 'luxon'
 
 export default {
   data () {
@@ -49,8 +51,9 @@ export default {
       singleDay: true,
       perCapita: true,
       date1: new Date(),
-      svgWidth: 0,
-      svgHeight: 0,
+      loading: false,
+      svgWidth: 600,
+      svgHeight: 600,
       svg: {},
       populationData: [],
       covidData: [],
@@ -94,8 +97,10 @@ export default {
       this.svg.attr('height', Math.round(this.svgHeight))
       this.update()
     },
-    async getDataOnDate () {
-      this.covidData = await d3.csv('https://covidtracking.com/api/states/daily.csv?date=20200328', d3.autoType)
+    async getDataOnDate (update) {
+      const dateString = DateTime.fromJSDate(this.date1).toFormat('yyyyLLdd')
+      this.covidData = await d3.csv(`https://covidtracking.com/api/states/daily.csv?date=${dateString}`, d3.autoType)
+      if (update) this.update(true)
     },
     async getPopulationData () {
       this.populationData = await d3.csv('/population_states.csv', d3.autoType)
@@ -138,16 +143,32 @@ export default {
         .attr('cy', d => y(d.y))
         .attr('r', 3)
 
+      const delaunay = Delaunay.from(adjustedData, (d) => x(d.x), (d) => y(d.y))
+      const voronoi = delaunay.voronoi([this.margin.left, -1, width - 25, height - this.margin.bottom])
+
+      const orient = {
+        top: text => text.attr('text-anchor', 'middle').attr('y', -6),
+        right: text => text.attr('text-anchor', 'start').attr('dy', '0.35em').attr('x', 6),
+        bottom: text => text.attr('text-anchor', 'middle').attr('dy', '0.71em').attr('y', 6),
+        left: text => text.attr('text-anchor', 'end').attr('dy', '0.35em').attr('x', -6)
+      }
+      const cells = adjustedData.map((d, i) => ({ point: [x(d.x), y(d.y)], state: d.state, poly: voronoi.cellPolygon(i) }))
       svg.selectAll('g.text')
         .attr('font-family', 'sans-serif')
         .attr('font-size', 10)
         .selectAll('text')
-        .data(adjustedData)
+        .data(cells)
         .join('text')
-        .transition(t)
-        .attr('dy', '0.35em')
-        .attr('x', d => x(d.x) + 7)
-        .attr('y', d => y(d.y))
+        .each(function ({ point, poly, state }) {
+          const [cx, cy] = d3.polygonCentroid(poly)
+          const angle = (Math.round(Math.atan2(cy - point[0], cx - point[1]) / Math.PI * 2) + 4) % 4
+          d3.select(this).call(angle === 0 ? orient.right
+            : angle === 3 ? orient.top
+              : angle === 1 ? orient.bottom
+                : orient.left)
+        })
+        .attr('transform', ({ point }) => `translate(${point[0]},${point[1]})`)
+        .attr('display', ({ poly }) => -d3.polygonArea(poly) > 2000 ? null : 'none')
         .text(d => d.state)
 
       const xAxis = g => g
