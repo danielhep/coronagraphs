@@ -147,19 +147,25 @@ export default {
       const voronoi = delaunay.voronoi([this.margin.left, -1, width - 25, height - this.margin.bottom])
 
       const orient = {
-        top: text => text.attr('text-anchor', 'middle').attr('y', -6),
-        right: text => text.attr('text-anchor', 'start').attr('dy', '0.35em').attr('x', 6),
-        bottom: text => text.attr('text-anchor', 'middle').attr('dy', '0.71em').attr('y', 6),
+        top: text => text.transition(t).attr('text-anchor', 'middle').attr('y', -6),
+        right: text => text.transition(t).attr('text-anchor', 'start').attr('dy', '0.35em').attr('x', 6),
+        bottom: text => text.transition(t).attr('text-anchor', 'middle').attr('dy', '0.71em').attr('y', 6),
         left: text => text.attr('text-anchor', 'end').attr('dy', '0.35em').attr('x', -6)
       }
       const cells = adjustedData.map((d, i) => ({ point: [x(d.x), y(d.y)], state: d.state, poly: voronoi.cellPolygon(i) }))
+        // don't bother displaying text for a field if there is no polygon for it
+        // no polygon happens when the point is right at an edge
+        .filter(c => c.poly)
       svg.selectAll('g.text')
         .attr('font-family', 'sans-serif')
         .attr('font-size', 10)
         .selectAll('text')
         .data(cells)
-        .join('text')
-        .each(function ({ point, poly, state }) {
+        .join(
+          enter => enter.append('text')
+        )
+        .transition(t)
+        .each(function ({ point, poly, state }, i) {
           const [cx, cy] = d3.polygonCentroid(poly)
           const angle = (Math.round(Math.atan2(cy - point[0], cx - point[1]) / Math.PI * 2) + 4) % 4
           d3.select(this).call(angle === 0 ? orient.right
@@ -168,7 +174,7 @@ export default {
                 : orient.left)
         })
         .attr('transform', ({ point }) => `translate(${point[0]},${point[1]})`)
-        .attr('display', ({ poly }) => -d3.polygonArea(poly) > 2000 ? null : 'none')
+        .attr('opacity', ({ poly }) => -d3.polygonArea(poly) > 2000 ? 1 : 0)
         .text(d => d.state)
 
       const xAxis = g => g
