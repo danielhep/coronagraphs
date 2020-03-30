@@ -9,9 +9,20 @@
     </div>
     <div class="columns">
       <div class="column container is-fluid is-one-quarter">
-        <b-field :label="singleDay ? 'Date' : 'Start Date'">
+        <b-field :label="singleDay ? 'Date' : 'Date Range'">
           <b-datepicker
+            v-if="singleDay"
             v-model="date1"
+            :min-date="dateRange[0].toJSDate()"
+            :max-date="dateRange[1].toJSDate()"
+            placeholder="Click to select..."
+            icon="calendar-today"
+            :loading="loading"
+          ></b-datepicker>
+          <b-datepicker
+            v-else
+            v-model="dates"
+            range
             :min-date="dateRange[0].toJSDate()"
             :max-date="dateRange[1].toJSDate()"
             placeholder="Click to select..."
@@ -20,12 +31,10 @@
           ></b-datepicker>
         </b-field>
         <b-field>
-          <div class="control">
+          <div class="control level">
             <b-switch v-model="singleDay">Single day analysis</b-switch>
+            <b-button v-if="!singleDay" @click="selectAllTime()">All Time</b-button>
           </div>
-        </b-field>
-        <b-field label="End Date" v-if="!singleDay">
-          <b-datepicker placeholder="Click to select..." icon="calendar-today" trap-focus></b-datepicker>
         </b-field>
         <hr />
         <b-field>
@@ -56,6 +65,7 @@ export default {
       date1: new Date(),
       svgWidth: 600,
       svgHeight: 600,
+      dates: [],
       svg: {},
       margin: { top: 25, right: 20, bottom: 35, left: 50 },
       randomID: this._uid
@@ -69,22 +79,39 @@ export default {
   computed: {
     ...mapState(['dateRange', 'loading']),
     data () {
-      const dateObj = DateTime.fromJSDate(this.date1)
-      const data = this.$store.state.stateData.filter(d => d.date.toISODate() === dateObj.toISODate())
-
       let adjustedData
-      if (this.perCapita) {
-        adjustedData = data.map((d) => ({ ...d, x: d.positive / (d.population / 100000), y: d.totalTestResults / (d.population / 100000) }))
+
+      if (this.singleDay) {
+        const dateObj = DateTime.fromJSDate(this.date1)
+        const data = this.$store.state.stateData.filter(d => d.date.toISODate() === dateObj.toISODate())
+        adjustedData = data.map((d) => ({ ...d, x: d.positiveIncrease, y: d.totalTestResultsIncrease }))
       } else {
-        adjustedData = data.map((d) => ({ ...d, x: d.positive, y: d.totalTestResults }))
+        const date1 = DateTime.fromJSDate(this.dates[1]) // later date
+        const date2 = DateTime.fromJSDate(this.dates[0]) // earlier date
+        const data2 = this.$store.state.stateData.filter(d => d.date.toISODate() === date2.toISODate())
+        const data1 = this.$store.state.stateData.filter(d => d.date.toISODate() === date1.toISODate())
+        // filter out any states that didn't exist in the earlier data set
+          .filter(d => data2.find(({ state }) => d.state === state))
+        console.log(data1.length - data2.length)
+        adjustedData = data1.map((d) => ({
+          ...d,
+          x: d.positive - data2.find(d2 => d2.state === d.state).positive,
+          y: d.totalTestResults - data2.find(d2 => d2.state === d.state).totalTestResults
+        }))
       }
 
+      if (this.perCapita) {
+        adjustedData = adjustedData.map((d) => ({ ...d, x: d.x / (d.population / 100000), y: d.y / (d.population / 100000) }))
+      }
       adjustedData.x = 'Positive cases'
       adjustedData.y = 'Tests performed'
       return adjustedData
     }
   },
   methods: {
+    selectAllTime () {
+      this.dates = this.dateRange.map(d => d.toJSDate())
+    },
     onResize ({ width, height }) {
       this.svgWidth = width
       this.svgHeight = width / (4 / 3)
