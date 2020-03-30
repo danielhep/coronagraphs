@@ -20,7 +20,7 @@
       <div class="content has-text-centered">
         <p>
           <strong>CovidGraphs</strong> by
-          <a href="https://danielheppner.com">Daniel Heppner</a>. The source code is licensed
+          <a href="https://twitter.com/danielhep">Daniel Heppner</a>. The source code is licensed
           <a href="http://opensource.org/licenses/mit-license.php">MIT</a>. Data provided by
           <a href="https://covidtracking.com/">The COVID Tracking Project.</a>
         </p>
