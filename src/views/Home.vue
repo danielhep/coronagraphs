@@ -24,6 +24,7 @@
           <a href="http://opensource.org/licenses/mit-license.php">MIT</a>. Data provided by
           <a href="https://covidtracking.com/">The COVID Tracking Project.</a>
         </p>
+        <b-icon icon="github"></b-icon>
       </div>
     </footer>
   </div>

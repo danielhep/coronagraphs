@@ -33,13 +33,30 @@
         <b-field>
           <div class="control level">
             <b-switch v-model="singleDay">Single day analysis</b-switch>
-            <b-button v-if="!singleDay" @click="selectAllTime()">All Time</b-button>
+            <b-tooltip
+              type="is-light"
+              label="If enabled: only look at the change in data over one day.
+              If disabled: select a range in date picker and graph will show change over selected time span."
+              multilined
+            >
+              <b-icon icon="help-circle-outline" size="is-small"></b-icon>
+            </b-tooltip>
           </div>
+        </b-field>
+        <b-field>
+          <b-button v-if="!singleDay" @click="selectAllTime()">All Time</b-button>
         </b-field>
         <hr />
         <b-field>
-          <div class="control">
+          <div class="control level">
             <b-switch v-model="perCapita">Per capita adjustment</b-switch>
+            <b-tooltip
+              type="is-light"
+              label="Divide all numbers by states' populations divded by 100k."
+              multilined
+            >
+              <b-icon icon="help-circle-outline" size="is-small"></b-icon>
+            </b-tooltip>
           </div>
         </b-field>
       </div>
