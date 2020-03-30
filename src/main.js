@@ -5,7 +5,12 @@ import store from './store'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 import VueResizeObserver from 'vue-resize-observer'
+import VueGtag from 'vue-gtag'
+
 Vue.use(VueResizeObserver)
+Vue.use(VueGtag, {
+  config: { id: 'UA-64119500-4' }
+})
 
 Vue.config.productionTip = false
 
