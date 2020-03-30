@@ -81,8 +81,8 @@ export default {
     data () {
       // add population numbers to the data
       const data = this.populationData.map(d => ({ ...this.covidData.find(c => c.state === d.state), population: d.pop }))
-      data.x = 'Test'
-      data.y = 'test'
+      data.x = 'Positive cases'
+      data.y = 'Tests performed'
       return data
     }
   },
