@@ -1,13 +1,25 @@
 <template>
-  <div class="columns is-fluid">
-    <div class="column">
-      <testing-v-positive-cases />
+  <div>
+    <div class="columns">
+      <div class="column">
+        <testing-v-positive-cases />
+      </div>
+      <b-menu style="padding-top: 20px" class="column container is-fluid is-one-fifth">
+        <b-menu-list label="Graphs">
+          <b-menu-item icon="information-outline" active label="Testing Capacity vs Positive Cases"></b-menu-item>
+        </b-menu-list>
+      </b-menu>
     </div>
-    <b-menu style="padding-top: 20px" class="column container is-fluid is-one-fifth">
-      <b-menu-list label="Graphs">
-        <b-menu-item icon="information-outline" active label="Testing Capacity vs Positive Cases"></b-menu-item>
-      </b-menu-list>
-    </b-menu>
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong>CovidGraphs</strong> by
+          <a href="https://danielheppner.com">Daniel Heppner</a>. The source code is licensed
+          <a href="http://opensource.org/licenses/mit-license.php">MIT</a>. Data provided by
+          <a href="https://covidtracking.com/">The COVID Tracking Project.</a>
+        </p>
+      </div>
+    </footer>
   </div>
 </template>
 

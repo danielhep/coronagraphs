@@ -119,6 +119,7 @@ export default {
     resize () {
       this.svg.attr('width', this.svgWidth)
       this.svg.attr('height', Math.round(this.svgHeight))
+      d3.select(this.svg.node().parentNode).style('height', `${Math.round(this.svgHeight)}px`)
       this.update()
     },
     update (transition) {
@@ -171,7 +172,7 @@ export default {
         .attr('font-family', 'sans-serif')
         .attr('font-size', 10)
         .selectAll('text')
-        .data(cells)
+        .data(cells, ({ state }) => state)
         .join(
           enter => enter.append('text')
         )
