@@ -92,7 +92,6 @@ export default {
         const data1 = this.$store.state.stateData.filter(d => d.date.toISODate() === date1.toISODate())
         // filter out any states that didn't exist in the earlier data set
           .filter(d => data2.find(({ state }) => d.state === state))
-        console.log(data1.length - data2.length)
         adjustedData = data1.map((d) => ({
           ...d,
           x: d.positive - data2.find(d2 => d2.state === d.state).positive,
