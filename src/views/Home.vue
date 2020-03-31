@@ -3,6 +3,7 @@
     <div class="columns">
       <div class="column">
         <testing-v-positive-cases />
+        <testing-over-time v-if="false" />
       </div>
       <b-menu style="padding-top: 30px; " class="column container is-fluid is-one-fifth">
         <div style="position: sticky; top: 10px;">
@@ -35,11 +36,13 @@
 <script>
 // @ is an alias to /src
 import TestingVPositiveCases from '@/components/TestingVPositiveCases.vue'
+import TestingOverTime from '@/components/TestingOverTime.vue'
 
 export default {
   name: 'Home',
   components: {
-    TestingVPositiveCases
+    TestingVPositiveCases,
+    TestingOverTime
   },
   created () {
     this.$store.dispatch('getData')

@@ -1,13 +1,13 @@
 <template>
-  <section>
+  <section style="margin-top: 15px">
     <div class="hero is-dark">
       <div class="hero-body">
         <div class="container">
-          <h1 class="title">Testing Capacity vs. Positive Cases</h1>
+          <h1 class="title">Testing Over Time</h1>
         </div>
       </div>
     </div>
-    <div class="columns" style="margin-top: 15px">
+    <div class="columns" style="margin-top: 15px;">
       <div class="column container is-fluid is-one-quarter">
         <b-field :label="singleDay ? 'Date' : 'Date Range'">
           <b-datepicker
@@ -44,19 +44,6 @@
           </div>
         </b-field>
         <b-field>
-          <div class="level">
-            <div class="level-item=left">
-              <b-button
-                @click="() => {play = !play; if(play) playEnabled()}"
-                :icon-right="play ? 'pause' : 'play'"
-              />
-            </div>
-            <div class="level-item" style="margin-left: 5px">
-              <b-progress :max="(allDates.length - 1)" :value="dateIndex" />
-            </div>
-          </div>
-        </b-field>
-        <b-field>
           <b-button v-if="!singleDay" @click="selectAllTime()">All Time</b-button>
         </b-field>
         <hr />
@@ -90,7 +77,6 @@ import { mapState } from 'vuex'
 export default {
   data () {
     return {
-      dateIndex: 0,
       singleDay: true,
       perCapita: true,
       date1: new Date(),
@@ -99,8 +85,7 @@ export default {
       dates: [],
       svg: {},
       margin: { top: 25, right: 20, bottom: 35, left: 50 },
-      randomID: this._uid,
-      play: false
+      randomID: this._uid
     }
   },
   mounted () {
@@ -109,7 +94,7 @@ export default {
     this.create()
   },
   computed: {
-    ...mapState(['dateRange', 'loading', 'allDates']),
+    ...mapState(['dateRange', 'loading']),
     data () {
       let adjustedData
 
@@ -143,13 +128,6 @@ export default {
     selectAllTime () {
       this.dates = this.dateRange.map(d => d.toJSDate())
     },
-    playEnabled () {
-      if (this.singleDay) {
-        this.singleDay = false
-      }
-      this.$set(this.dates, 0, this.dateRange[0].toJSDate())
-      this.dateIndex = 1
-    },
     onResize ({ width, height }) {
       this.svgWidth = width
       this.svgHeight = width / (4 / 3)
@@ -161,18 +139,16 @@ export default {
       d3.select(this.svg.node().parentNode).style('height', `${Math.round(this.svgHeight)}px`)
       this.update()
     },
-    async update (transition) {
+    update (transition) {
       const width = this.svgWidth
       const height = this.svgHeight
       const data = this.data
       const margin = this.margin
       const svg = this.svg
 
-      const transitionDuration = transition ? 500 : 0
-      const easing = this.play ? d3.easeLinear : d3.easeCubic
+      const transitionDuration = transition ? 750 : 0
       const t = d3.transition()
         .duration(transitionDuration)
-        .ease(easing)
 
       const adjustedData = this.data
 
@@ -283,14 +259,6 @@ export default {
 
       svg.select('.grid')
         .call(grid)
-
-      if (this.play && this.dateIndex < this.allDates.length - 1) {
-        await t.end()
-        this.dateIndex = this.dateIndex + 1
-        this.$set(this.dates, 1, this.allDates[this.dateIndex].toJSDate())
-      } else if (this.play) {
-        this.play = false
-      }
     },
     create () {
       const svg = this.svg
@@ -305,9 +273,6 @@ export default {
   watch: {
     data () {
       this.update(true)
-    },
-    dateRange () {
-      this.date1 = this.dateRange[1].toJSDate()
     }
   }
 }

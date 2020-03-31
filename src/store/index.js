@@ -11,13 +11,17 @@ export default new Vuex.Store({
   state: {
     stateData: [],
     dateRange: [DateTime.local(), DateTime.local()],
+    allDates: [],
     loading: false
   },
   mutations: {
     setStateData (state, data) {
       state.stateData = data
-
       state.dateRange = [data[data.length - 1].date, data[0].date]
+      state.allDates = data.reduce((arr, { date }) => {
+        if (!arr.find(d => d.toISODate() === date.toISODate())) arr[arr.length] = date
+        return arr
+      }, []).reverse()
     },
     setLoading (state, data) {
       state.loading = data
