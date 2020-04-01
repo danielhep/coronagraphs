@@ -184,11 +184,11 @@ export default {
       const adjustedData = this.data
 
       const x = d3.scaleLinear()
-        .domain(d3.extent(adjustedData, d => d.x)).nice()
+        .domain([0, d3.max(adjustedData, d => d.x)]).nice()
         .range([margin.left, width - margin.right])
 
       const y = d3.scaleLinear()
-        .domain(d3.extent(adjustedData, d => d.y)).nice()
+        .domain([0, d3.max(adjustedData, d => d.y)]).nice()
         .range([height - margin.bottom, margin.top])
 
       svg.selectAll('g.dots')
