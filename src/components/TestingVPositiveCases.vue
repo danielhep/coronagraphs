@@ -109,19 +109,19 @@ export default {
     this.create()
   },
   computed: {
-    ...mapState(['dateRange', 'loading', 'allDates']),
+    ...mapState(['dateRange', 'loading', 'allDates', 'filteredStateData']),
     data () {
       let adjustedData
 
       if (this.singleDay) {
         const dateObj = DateTime.fromJSDate(this.date1)
-        const data = this.$store.state.stateData.filter(d => d.date.toISODate() === dateObj.toISODate())
+        const data = this.filteredStateData.filter(d => d.date.toISODate() === dateObj.toISODate())
         adjustedData = data.map((d) => ({ ...d, x: d.positiveIncrease, y: d.totalTestResultsIncrease }))
       } else {
         const date1 = DateTime.fromJSDate(this.dates[1]) // later date
         const date2 = DateTime.fromJSDate(this.dates[0]) // earlier date
-        const data2 = this.$store.state.stateData.filter(d => d.date.toISODate() === date2.toISODate())
-        const data1 = this.$store.state.stateData.filter(d => d.date.toISODate() === date1.toISODate())
+        const data2 = this.filteredStateData.filter(d => d.date.toISODate() === date2.toISODate())
+        const data1 = this.filteredStateData.filter(d => d.date.toISODate() === date1.toISODate())
         // filter out any states that didn't exist in the earlier data set
           .filter(d => data2.find(({ state }) => d.state === state))
         adjustedData = data1.map((d) => ({

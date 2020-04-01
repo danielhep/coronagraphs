@@ -12,7 +12,10 @@ export default new Vuex.Store({
     stateData: [],
     dateRange: [DateTime.local(), DateTime.local()],
     allDates: [],
-    loading: false
+    loading: false,
+    stateList: [],
+    filteredStateData: [],
+    selectedStates: []
   },
   mutations: {
     setStateData (state, data) {
@@ -22,17 +25,31 @@ export default new Vuex.Store({
         if (!arr.find(d => d.toISODate() === date.toISODate())) arr[arr.length] = date
         return arr
       }, []).reverse()
+      state.stateList = data.reduce((arr, { state }) => {
+        if (!arr.find(d => d === state)) arr[arr.length] = state
+        return arr
+      }, [])
+      state.selectedStates = state.stateList
+      state.filteredStateData = state.stateData.filter(d => {
+        return state.stateList.includes(d.state)
+      })
     },
     setLoading (state, data) {
       state.loading = data
+    },
+    setSelectedStates (state, data) {
+      state.selectedStates = data
+      state.filteredStateData = state.stateData.filter(({ state }) => {
+        return data.includes(state)
+      })
     }
   },
   actions: {
     async getData ({ commit }) {
       commit('setLoading', true)
-      // const covidData = (await d3.csv('https://covidtracking.com/api/states/daily.csv', () => ))
       const covidData = (await (await fetch('https://covidtracking.com/api/states/daily')).json())
         .map(d => ({ ...d, date: DateTime.fromISO(d.date) }))
+
       const populationData = await d3.csv('/population_states.csv', d3.autoType)
       const data = covidData.map(d => ({ population: populationData.find(c => c.state === d.state).pop, ...d }))
       commit('setStateData', data)
