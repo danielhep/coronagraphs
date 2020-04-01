@@ -19,23 +19,15 @@
             </div>
           </b-menu>
 
-          <div class="columns" style="padding-top: 20px">
-            <b-field class="column" label="Filter states:">
-              <b-select
-                multiple
-                native-size="10"
-                :value="selectedStates"
-                @input="(e) => $store.commit('setSelectedStates', e)"
-              >
-                <option v-for="state in stateList" :key="state" :value="state">{{state}}</option>
-              </b-select>
-            </b-field>
-            <p class="column">
-              Hold control and click to select mutltiple states. Or,
-              <a
-                @click="() => $store.commit('setSelectedStates', stateList)"
-              >click here</a> to select all.
-            </p>
+          <div style="padding-top: 20px">
+            <div>Filter by state:</div>
+            <multiselect
+              :options="stateList"
+              :multiple="true"
+              :close-on-select="false"
+              :value="selectedStates"
+              @input="(e) => $store.commit('setSelectedStates', e)"
+            />
           </div>
         </div>
       </div>

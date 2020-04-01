@@ -6,7 +6,10 @@ import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 import VueResizeObserver from 'vue-resize-observer'
 import VueGtag from 'vue-gtag'
-
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.min.css'
+// register globally
+Vue.component('multiselect', Multiselect)
 Vue.use(VueResizeObserver)
 Vue.use(VueGtag, {
   config: { id: 'UA-64119500-4' }

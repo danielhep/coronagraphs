@@ -29,19 +29,27 @@ export default new Vuex.Store({
         if (!arr.find(d => d === state)) arr[arr.length] = state
         return arr
       }, [])
-      state.selectedStates = state.stateList
-      state.filteredStateData = state.stateData.filter(d => {
-        return state.stateList.includes(d.state)
-      })
+
+      if (state.selectedStates.length) {
+        state.filteredStateData = state.stateData.filter(d => {
+          return state.selectedStates.includes(d.state)
+        })
+      } else {
+        state.filteredStateData = state.stateData
+      }
     },
     setLoading (state, data) {
       state.loading = data
     },
     setSelectedStates (state, data) {
       state.selectedStates = data
-      state.filteredStateData = state.stateData.filter(({ state }) => {
-        return data.includes(state)
-      })
+      if (data.length) {
+        state.filteredStateData = state.stateData.filter(d => {
+          return data.includes(d.state)
+        })
+      } else {
+        state.filteredStateData = state.stateData
+      }
     }
   },
   actions: {
