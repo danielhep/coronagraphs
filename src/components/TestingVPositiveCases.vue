@@ -73,7 +73,7 @@
           </div>
         </b-field>
         <hr />
-        <h1 class="title">What is this data?</h1>
+        <h4 class="title is-4">What is this data?</h4>
         <p>The Y (vertical) axis is showing the number of tests that have been performed {{singleDay ? `on ${date1.toLocaleDateString()}.` : `between ${dates[0].toLocaleDateString()} and ${dates[1].toLocaleDateString()}.`}}</p>
         <p>The X (horizontal) axis is showing the number of positive test results {{singleDay ? `on ${date1.toLocaleDateString()}.` : `between ${dates[0].toLocaleDateString()} and ${dates[1].toLocaleDateString()}.`}}</p>
         <p

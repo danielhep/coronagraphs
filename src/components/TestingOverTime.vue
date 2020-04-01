@@ -3,7 +3,7 @@
     <div class="hero is-dark">
       <div class="hero-body">
         <div class="container">
-          <h1 class="title">Testing Over Time</h1>
+          <h3 class="title is-3">Testing Over Time</h3>
         </div>
       </div>
     </div>
@@ -94,7 +94,7 @@ export default {
     this.create()
   },
   computed: {
-    ...mapState(['dateRange', 'loading']),
+    ...mapState(['dateRange', 'loading', 'allDates']),
     data () {
       let adjustedData
 
