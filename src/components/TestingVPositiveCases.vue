@@ -72,6 +72,13 @@
             </b-tooltip>
           </div>
         </b-field>
+        <hr />
+        <h1 class="title">What is this data?</h1>
+        <p>The Y (vertical) axis is showing the number of tests that have been performed {{singleDay ? `on ${date1.toLocaleDateString()}.` : `between ${dates[0].toLocaleDateString()} and ${dates[1].toLocaleDateString()}.`}}</p>
+        <p>The X (horizontal) axis is showing the number of positive test results {{singleDay ? `on ${date1.toLocaleDateString()}.` : `between ${dates[0].toLocaleDateString()} and ${dates[1].toLocaleDateString()}.`}}</p>
+        <p
+          v-if="perCapita"
+        >Both axes are scaled by 100,000 people. i.e. total data value / (state population / 100,000)</p>
       </div>
       <div class="column is-paddingless" ref="container" v-resize="onResize">
         <svg :data-id="_uid" style="position: absolute" />
@@ -308,6 +315,7 @@ export default {
     },
     dateRange () {
       this.date1 = this.dateRange[1].toJSDate()
+      this.dates = [this.dateRange[0].toJSDate(), this.dateRange[1].toJSDate()]
     }
   }
 }
