@@ -29,6 +29,16 @@
               @input="(e) => $store.commit('setSelectedStates', e)"
             />
           </div>
+          <div style="padding-top: 20px">
+            <div>Highlight states:</div>
+            <multiselect
+              :options="stateList"
+              :multiple="true"
+              :close-on-select="false"
+              :value="highlightedStates"
+              @input="(e) => $store.commit('setHighlightedStates', e)"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -64,7 +74,7 @@ export default {
     this.$store.dispatch('getData')
   },
   computed: {
-    ...mapState(['stateList', 'selectedStates'])
+    ...mapState(['stateList', 'selectedStates', 'highlightedStates'])
   }
 }
 </script>

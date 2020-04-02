@@ -15,6 +15,7 @@ export default new Vuex.Store({
     loading: false,
     stateList: [],
     filteredStateData: [],
+    highlightedStates: [],
     selectedStates: []
   },
   mutations: {
@@ -40,6 +41,12 @@ export default new Vuex.Store({
     },
     setLoading (state, data) {
       state.loading = data
+    },
+    setHighlightedStates (state, data) {
+      state.highlightedStates = data
+      state.filteredStateData = state.filteredStateData.map((d) => ({
+        ...d, highlight: data.includes(d.state)
+      }))
     },
     setSelectedStates (state, data) {
       state.selectedStates = data

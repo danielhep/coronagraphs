@@ -82,6 +82,7 @@
       </div>
       <div class="column is-paddingless" ref="container" v-resize="onResize">
         <svg :data-id="_uid" style="position: absolute" />
+        <div style="width: 100%; height: 100%; " />
       </div>
     </div>
   </section>
@@ -192,16 +193,16 @@ export default {
         .range([height - margin.bottom, margin.top])
 
       svg.selectAll('g.dots')
-        .attr('stroke', 'steelblue')
-        .attr('stroke-width', 1.5)
         .attr('fill', 'none')
         .selectAll('circle')
         .data(adjustedData)
         .join('circle')
+        .attr('stroke-width', d => (d.highlight ? 2.5 : 1.5))
+        .attr('stroke', (d) => (d.highlight ? 'red' : 'steelblue'))
         .transition(t)
         .attr('cx', d => x(d.x))
         .attr('cy', d => y(d.y))
-        .attr('r', 3)
+        .attr('r', d => (d.highlight ? 5 : 3))
 
       const delaunay = Delaunay.from(adjustedData, (d) => x(d.x), (d) => y(d.y))
       const voronoi = delaunay.voronoi([this.margin.left, -1, width - 25, height - this.margin.bottom])
@@ -212,7 +213,7 @@ export default {
         bottom: text => text.transition(t).attr('text-anchor', 'middle').attr('dy', '0.71em').attr('y', 6),
         left: text => text.attr('text-anchor', 'end').attr('dy', '0.35em').attr('x', -6)
       }
-      const cells = adjustedData.map((d, i) => ({ point: [x(d.x), y(d.y)], state: d.state, poly: voronoi.cellPolygon(i) }))
+      const cells = adjustedData.map((d, i) => ({ point: [x(d.x), y(d.y)], state: d.state, highlight: d.highlight, poly: voronoi.cellPolygon(i) }))
         // don't bother displaying text for a field if there is no polygon for it
         // no polygon happens when the point is right at an edge
         .filter(c => c.poly)
@@ -234,7 +235,7 @@ export default {
                 : orient.left)
         })
         .attr('transform', ({ point }) => `translate(${point[0]},${point[1]})`)
-        .attr('opacity', ({ poly }) => -d3.polygonArea(poly) > 2000 ? 1 : 0)
+        .attr('opacity', ({ poly, highlight }) => ((-d3.polygonArea(poly) > 2000) || highlight) ? 1 : 0)
         .text(d => d.state)
 
       const xAxis = g => g
