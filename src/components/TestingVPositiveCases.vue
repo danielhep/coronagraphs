@@ -128,10 +128,9 @@ export default {
       } else {
         const date1 = DateTime.fromJSDate(this.dates[1]) // later date
         const date2 = DateTime.fromJSDate(this.dates[0]) // earlier date
-        const data2 = this.filteredStateData.filter(d => d.date.toISODate() === date2.toISODate())
         const data1 = this.filteredStateData.filter(d => d.date.toISODate() === date1.toISODate())
-        // filter out any states that didn't exist in the earlier data set
-          .filter(d => data2.find(({ state }) => d.state === state))
+        const data2 = this.filteredStateData.filter(d => d.date.toISODate() === date2.toISODate())
+
         adjustedData = data1.map((d) => ({
           ...d,
           x: d.positive - data2.find(d2 => d2.state === d.state).positive,

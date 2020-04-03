@@ -20,8 +20,8 @@ export default new Vuex.Store({
   },
   mutations: {
     setStateData (state, data) {
-      state.stateData = data
       state.dateRange = [data[data.length - 1].date, data[0].date]
+
       state.allDates = data.reduce((arr, { date }) => {
         if (!arr.find(d => d.toISODate() === date.toISODate())) arr[arr.length] = date
         return arr
@@ -31,11 +31,24 @@ export default new Vuex.Store({
         return arr
       }, [])
 
+      // fill in blank data (zeros) for missing states
+      state.stateData = state.allDates.reduce((data, date) => { // called once per date
+        // Find any dates where there are states missing
+        state.stateList.forEach(state => {
+          const findRes = data.find(d => d.date === date && d.state === state)
+          if (!findRes) data.push({ state, date, positive: 0, totalTestResults: 0 })
+        })
+        return data
+      }, data)
+
+      // If we are filtering by states
       if (state.selectedStates.length) {
         state.filteredStateData = state.stateData.filter(d => {
+          // filter by selected state
           return state.selectedStates.includes(d.state)
         })
       } else {
+        // don't filter
         state.filteredStateData = state.stateData
       }
     },
