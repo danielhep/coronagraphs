@@ -78,7 +78,7 @@
         <p>The X (horizontal) axis is showing the number of positive test results {{singleDay ? `on ${date1.toLocaleDateString()}.` : `between ${dates[0].toLocaleDateString()} and ${dates[1].toLocaleDateString()}.`}}</p>
         <p
           v-if="perCapita"
-        >Both axes are scaled by 100,000 people. i.e. total data value / (state population / 100,000)</p>
+        >Both axes are scaled by 100,000 population. i.e. total data value / (state population / 100,000)</p>
       </div>
       <div class="column is-paddingless" ref="container" v-resize="onResize">
         <svg :data-id="_uid" style="position: absolute" />
